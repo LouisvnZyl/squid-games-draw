@@ -1,22 +1,25 @@
 import cv2
 import numpy as np
 
-def build_mapped_streams(sourceIndex: int):
+def initialize_video_stream(sourceIndex: int) -> cv2.VideoCapture:
     cap = cv2.VideoCapture(sourceIndex)
     
-def create_painting_canvas(canvasName: str, windowSize: int):
+    return cap
+    
+def create_painting_canvas() -> np.ndarray:
     paintWindow = np.zeros((471, 636, 3)) + 255
     
-    cv2.namedWindow(canvasName, windowSize)
+    return paintWindow
     
-def initialize_video_source(sourceIndex: int):
-    cap = cv2.VideoCapture(sourceIndex)
-    
+def build_steam_frames(cap: cv2.VideoCapture):    
+    # Read each frame from the capture source
     ret, frame = cap.read()
     
-    x, y, c = frame.shape
-    
+    # Flip the frame vertically
     frame = cv2.flip(frame, 1)
     framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     
     return ret, frame, framergb
+
+def display_frame(frameName: str ,frame):
+    cv2.imshow(frameName, frame)

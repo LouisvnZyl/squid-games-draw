@@ -3,6 +3,8 @@ import numpy as np
 import mediapipe as mp
 from collections import deque
 import time
+from Services.ImageService import initialize_video_stream, build_steam_frames, create_painting_canvas, display_frame
+from Services.GeastureService import initialize_mediapipe, predict_hand_landmark, draw_hand_landmarks
 
 # All the imports go here
 
@@ -27,18 +29,14 @@ colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255)]
 colorIndex = 0
 
 # Here is code for Canvas setup
-paintWindow = np.zeros((471, 636, 3)) + 255
-
-cv2.namedWindow('Paint', cv2.WINDOW_AUTOSIZE)
+paintWindow = create_painting_canvas()
 
 # Initialize mediapipe
-mpHands = mp.solutions.hands
-hands = mpHands.Hands(max_num_hands=1, min_detection_confidence=0.7) #This defines the sts
-mpDraw = mp.solutions.drawing_utils
+mpHands, hands, mpDraw = initialize_mediapipe()
 
 # Initialize the webcam
-cap = cv2.VideoCapture(0) # This refers to the video capture device of index 0. More can be added if more are available by changing the index.
-ret = True
+cap = initialize_video_stream(0)
+
 start_time = time.time()
 
 # Define the absolute path where the image will be saved (on the Raspberry Pi Desktop)
@@ -46,41 +44,21 @@ output_filename = "DrawnImages/drawing_output.png"
 
 # The idea here is to have this loop be an inner functioning loop in the overall program.
 # We will allow someone to draw an image with the given time below and once time runs out we want to then store the drawn picture frame.
-# This frame will then be presented to the model and an evaluation result will then be presented based on the model.
+# This frame will then be presented to the model and an evaluation handLandmarks will then be presented based on the model.
 # With the model some tips I can give is to have a class load in the model and see if that can be stored as a property. This can be done on the constructor.
 # Then you instantiate the model class at the start so that it all gets initialised and then you can make use of it. This is to save on memory and processing time.
 
-while time.time() - start_time < 120:
-    # Read each frame from the webcam
-    ret, frame = cap.read()
-
-    x, y, c = frame.shape
-
-    # Flip the frame vertically
-    frame = cv2.flip(frame, 1)
-    framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+while time.time() - start_time < 120:    
+    ret, frame, framergb = build_steam_frames(cap)
 
     # Get hand landmark prediction
-    result = hands.process(framergb)
+    handLandmarks = predict_hand_landmark(frame, hands)
 
     #This code below will probably need modification to make use of a wand of some sorts when drawing over the frame but, this needs to be investigated more.
-    # Post process the result
-    if result.multi_hand_landmarks:
-        landmarks = []
-        for handslms in result.multi_hand_landmarks:
-            for lm in handslms.landmark:
-                lmx = int(lm.x * 640)
-                lmy = int(lm.y * 480)
+    # Post process the handLandmarks
+    if handLandmarks.multi_hand_landmarks:        
+        center, thumb = draw_hand_landmarks(handLandmarks, mpDraw, mpHands, frame)
 
-                landmarks.append([lmx, lmy])
-
-            # Drawing landmarks on frames
-            mpDraw.draw_landmarks(frame, handslms, mpHands.HAND_CONNECTIONS)
-        fore_finger = (landmarks[8][0], landmarks[8][1])
-        center = fore_finger
-        thumb = (landmarks[4][0], landmarks[4][1])
-        cv2.circle(frame, center, 3, (0, 255, 0), -1)
-        print(center[1] - thumb[1])
         if (thumb[1] - center[1] < 30):
             bpoints.append(deque(maxlen=512))
             blue_index += 1
@@ -144,8 +122,9 @@ while time.time() - start_time < 120:
                 cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
     # Display the frame (if necessary)
-    cv2.imshow("Output", frame)
-    cv2.imshow("Paint", paintWindow) # The paint window represents the actual drawing over the screen and not the video being captured by the webcam.
+    
+    display_frame("Output", frame)
+    display_frame("Paint", paintWindow) # The paint window represents the actual drawing over the screen and not the video being captured by the webcam.
     # you can also think about not showing the output frame and only show the blank canvas butm the output frame will still be used as reference in the code.
 
     # Save the image when the time is near the limit (0.5 seconds before it runs out)
