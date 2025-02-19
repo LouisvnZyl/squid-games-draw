@@ -3,7 +3,7 @@ import numpy as np
 import mediapipe as mp
 from collections import deque
 import time
-from Services.ImageService import initialize_video_stream, build_stream_frames, create_painting_canvas
+from Services.ImageService import initialize_video_stream, build_stream_frames, create_painting_canvas, display_frame
 from Services.GeastureService import initialize_mediapipe, predict_hand_landmark, draw_hand_landmarks
 
 def image_stream_loop():
@@ -34,23 +34,28 @@ def image_stream_loop():
     # Initialize the webcam
     cap = initialize_video_stream(0)
 
+    # Start time for 60-second streaming duration
     start_time = time.time()
 
     # Define the absolute path where the image will be saved (on the Raspberry Pi Desktop)
     output_filename = "DrawnImages/drawing_output.png"
     
-    ret, frame, framergb = build_stream_frames(cap)
-    
-    while time.time() - start_time < 60:
+    while True:
+        # Capture frame from webcam
+        ret, frame, framergb = build_stream_frames(cap)
+        
+        if not ret:
+            print("Failed to grab frame")
+            break
+        
         # Get hand landmark prediction
         handLandmarks = predict_hand_landmark(frame, hands)
 
-        #This code below will probably need modification to make use of a wand of some sorts when drawing over the frame but, this needs to be investigated more.
-        # Post process the handLandmarks
         if handLandmarks.multi_hand_landmarks:        
             center, thumb = draw_hand_landmarks(handLandmarks, mpDraw, mpHands, frame)
 
             if (thumb[1] - center[1] < 30):
+                # When thumb touches the center, start a new color
                 bpoints.append(deque(maxlen=512))
                 blue_index += 1
                 gpoints.append(deque(maxlen=512))
@@ -91,8 +96,8 @@ def image_stream_loop():
                 elif colorIndex == 3:
                     ypoints[yellow_index].appendleft(center)
 
-        # Append the next deques when nothing is detected to avoid messing up
         else:
+            # Append new points to the deque when no hand is detected
             bpoints.append(deque(maxlen=512))
             blue_index += 1
             gpoints.append(deque(maxlen=512))
@@ -102,7 +107,7 @@ def image_stream_loop():
             ypoints.append(deque(maxlen=512))
             yellow_index += 1
 
-        # Draw lines of all the colors on the canvas and frame
+        # Draw the lines on the frame (canvas and drawing window)
         points = [bpoints, gpoints, rpoints, ypoints]
         for i in range(len(points)):
             for j in range(len(points[i])):
@@ -112,27 +117,29 @@ def image_stream_loop():
                     cv2.line(frame, points[i][j][k - 1], points[i][j][k], colors[i], 2)
                     cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
 
-        # Display the frame (if necessary)
-
-        # display_frame("Output", frame)
-        # display_frame("Paint", paintWindow) 
-
-        if time.time() - start_time >= 60:  # Save 0.5 seconds before the time runs out
-            paintWindow = cv2.convertScaleAbs(paintWindow)  # Convert the drawing to 8-bit
-            cv2.imwrite(output_filename, paintWindow)  # Save only the drawing, not the frame
+        # Save the drawing if the time exceeds 60 seconds
+        if time.time() - start_time >= 60:
+            paintWindow = cv2.convertScaleAbs(paintWindow)  # Convert drawing to 8-bit
+            cv2.imwrite(output_filename, paintWindow)  # Save drawing, not the frame
             print(f"Image saved as {output_filename}")
-            
-        frame_bytes = get_frame_bytes(frame)
+            break
         
+        # Convert frame to bytes for streaming
+        frame_bytes = get_frame_bytes(frame)
+
+        display_frame("Test", frame)
+        # Yield the frame for the MJPEG stream
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
     
     cap.release()
     cv2.destroyAllWindows()
-    
+
 def get_frame_bytes(frame) -> bytes:
+    # Encode frame as JPEG image
     ret, jpeg = cv2.imencode('.jpg', frame)
+    if not ret:
+        print("Failed to encode frame")
+        return b""
     
-    frame_bytes = jpeg.tobytes()
-    
-    return frame_bytes
+    return jpeg.tobytes()
