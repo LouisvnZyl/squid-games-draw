@@ -6,13 +6,6 @@ import time
 from Services.ImageService import initialize_video_stream, build_stream_frames, create_painting_canvas
 from Services.GeastureService import initialize_mediapipe, predict_hand_landmark, draw_hand_landmarks
 
-# All the imports go here
-
-# This is the main runninf file (Just a test to see if the concept works).
-
-
-
-
 def image_stream_loop():
     # Giving different arrays to handle colour points of different colour
     bpoints = [deque(maxlen=1024)]
