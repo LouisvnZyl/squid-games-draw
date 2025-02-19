@@ -11,7 +11,7 @@ def create_painting_canvas() -> np.ndarray:
     
     return paintWindow
     
-def build_steam_frames(cap: cv2.VideoCapture):    
+def build_stream_frames(cap: cv2.VideoCapture):    
     # Read each frame from the capture source
     ret, frame = cap.read()
     
