@@ -17,4 +17,8 @@ export class StreamIngestionService {
   public stopVideoStream(): Observable<void> {
     return this._httpClient.get<void>(`${this.url}/stop-video`);
   }
+
+  public checkStreamHealth(): Observable<boolean> {
+    return this._httpClient.get<boolean>(`${this.url}/stream-health`);
+  }
 }

@@ -1,5 +1,5 @@
 from flask import Blueprint, Response
-from Services.ImageProcessingService import image_stream_loop, stop_stream
+from Services.ImageProcessingService import image_stream_loop, stop_stream, is_stream_active
 
 video_routes = Blueprint('video_routes', __name__)
 
@@ -11,3 +11,9 @@ def video_feed():
 def stop_video_feed():
     stop_stream()
     return Response(status=200)
+
+@video_routes.route('/stream-health', methods=['GET'])
+def stream_health():
+    is_active = is_stream_active()
+    
+    return Response(str(is_active).lower(), status=200)
