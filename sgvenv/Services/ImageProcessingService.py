@@ -123,13 +123,6 @@ def image_stream_loop():
                         continue
                     cv2.line(frame, points[i][j][k - 1], points[i][j][k], colors[i], 2)
                     cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
-
-        # Save the drawing if the time exceeds 60 seconds
-        if time.time() - start_time >= 60:
-            paintWindow = cv2.convertScaleAbs(paintWindow)  # Convert drawing to 8-bit
-            cv2.imwrite(output_filename, paintWindow)  # Save drawing, not the frame
-            print(f"Image saved as {output_filename}")
-            break
         
         # Convert frame to bytes for streaming
         frame_bytes = get_frame_bytes(frame)
@@ -139,6 +132,9 @@ def image_stream_loop():
         # Yield the frame for the MJPEG stream
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        
+    paintWindow = cv2.convertScaleAbs(paintWindow)  # Convert drawing to 8-bit
+    cv2.imwrite(output_filename, paintWindow)  # Save drawing, not the frame
     
     cap.release()
     cv2.destroyAllWindows()
