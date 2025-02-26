@@ -9,7 +9,7 @@ export class StreamIngestionService {
   constructor(private readonly _httpClient: HttpClient) {}
 
   public getVideoStream(): Observable<ArrayBuffer> {
-    return this._httpClient.get('http://localhost:5000/video/video_feed', {
+    return this._httpClient.get('http://localhost:5000/video/video-feed', {
       responseType: 'arraybuffer',
     });
   }

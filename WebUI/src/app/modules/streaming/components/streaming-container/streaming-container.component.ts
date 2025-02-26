@@ -7,7 +7,7 @@ import { StreamIngestionService } from '../../services/stream-ingestion.service'
   standalone: true,
 })
 export class StreamingContainer {
-  streamUrl: string = 'http://localhost:5000/video/video_feed';
+  streamUrl: string = 'http://localhost:5000/video/video-feed';
   videoElement: HTMLImageElement | null = null;
 
   constructor(private readonly streamIngestionService: StreamIngestionService) {

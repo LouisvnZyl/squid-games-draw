@@ -1,8 +1,7 @@
-import cv2  
 import numpy as np
 import tensorflow as tf
 import os
-from keras.models import load_model
+from keras._tf_keras.keras.models import load_model
 
 
 # Disable scientific notation for clarity

@@ -6,6 +6,8 @@ import time
 from Services.ImageService import initialize_video_stream, build_stream_frames, create_painting_canvas, display_frame
 from Services.GeastureService import initialize_mediapipe, predict_hand_landmark, draw_hand_landmarks
 
+shouldStreamBeOpen = True
+
 def image_stream_loop():
     # Giving different arrays to handle colour points of different colour
     bpoints = [deque(maxlen=1024)]
@@ -40,7 +42,7 @@ def image_stream_loop():
     # Define the absolute path where the image will be saved (on the Raspberry Pi Desktop)
     output_filename = "DrawnImages/drawing_output.png"
     
-    while True:
+    while shouldStreamBeOpen:
         # Capture frame from webcam
         ret, frame, framergb = build_stream_frames(cap)
         
@@ -143,3 +145,7 @@ def get_frame_bytes(frame) -> bytes:
         return b""
     
     return jpeg.tobytes()
+
+def stop_stream():
+    global shouldStreamBeOpen
+    shouldStreamBeOpen = False
