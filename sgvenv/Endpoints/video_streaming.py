@@ -7,6 +7,7 @@ video_routes = Blueprint('video_routes', __name__)
 def video_feed():
     return Response(image_stream_loop(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@video_routes.route('/stop-video', methods=['POST'])
+@video_routes.route('/stop-video', methods=['GET'])
 def stop_video_feed():
-    return Response(stop_stream(), status=200)
+    stop_stream()
+    return Response(status=200)
