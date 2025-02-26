@@ -1,5 +1,12 @@
-<div id="video-container">
-  <h2>Live Video Stream</h2>
-  <img [src]="streamUrl" alt="Video Stream" />
-</div>
-<button (click)="onStopVideo()">Stop Stream</button>
+<ng-container *ngIf="isStreamActive$ | async; else noStream">
+  <div id="video-container">
+    <h2>Live Video Stream</h2>
+    <img [src]="streamUrl" alt="Video Stream" />
+  </div>
+  <button (click)="onStopVideo()">Stop Stream</button>
+</ng-container>
+
+<ng-template #noStream>
+  <button (click)="startStream()">Start Stream</button>
+  <p>No active stream available.</p>
+</ng-template>

@@ -8,13 +8,14 @@ import {
   of,
   Subject,
   switchMap,
-  take,
   takeUntil,
 } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   templateUrl: './streaming-container.component.html',
   providers: [StreamIngestionService],
+  imports: [CommonModule],
   standalone: true,
 })
 export class StreamingContainer implements OnDestroy {
@@ -23,12 +24,14 @@ export class StreamingContainer implements OnDestroy {
 
   public readonly isStreamActive$ = new BehaviorSubject<boolean>(false);
 
-  private _stopStream$ = new Subject<void>();
+  private readonly _stopStream$ = new Subject<void>();
+  private readonly _startStream$ = new Subject<void>();
   private readonly _destroy$ = new Subject<void>();
 
   constructor(private readonly streamIngestionService: StreamIngestionService) {
     this.setUpStreamStoppingObservable();
     this.setUpStreamEvaluation();
+    this.setUpStartStream();
   }
 
   public ngOnDestroy(): void {
@@ -36,12 +39,25 @@ export class StreamingContainer implements OnDestroy {
     this._destroy$.complete();
   }
 
+  public startStream(): void {
+    this._startStream$.next();
+  }
+
   public onStopVideo(): void {
     this._stopStream$.next();
   }
 
+  private setUpStartStream(): void {
+    this._startStream$
+      .pipe(
+        switchMap(() => this.streamIngestionService.getVideoStream()),
+        takeUntil(this._destroy$)
+      )
+      .subscribe();
+  }
+
   private setUpStreamEvaluation(): void {
-    interval(5000)
+    interval(1000)
       .pipe(
         switchMap(() => this.setUpCheckStreamHealth()),
         catchError((error) => {
@@ -51,7 +67,9 @@ export class StreamingContainer implements OnDestroy {
         takeUntil(this._destroy$)
       )
       .subscribe((result) => {
-        if (!result) {
+        if (result != null) {
+          this.isStreamActive$.next(result);
+        } else {
           this.isStreamActive$.next(false);
         }
       });
