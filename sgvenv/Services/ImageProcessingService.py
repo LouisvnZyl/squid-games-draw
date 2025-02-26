@@ -41,6 +41,9 @@ def image_stream_loop():
 
     # Define the absolute path where the image will be saved (on the Raspberry Pi Desktop)
     output_filename = "DrawnImages/drawing_output.png"
+
+    global shouldStreamBeOpen
+    shouldStreamBeOpen = True
     
     while shouldStreamBeOpen:
         # Capture frame from webcam
