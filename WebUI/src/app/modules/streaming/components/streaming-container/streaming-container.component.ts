@@ -11,11 +11,14 @@ import {
   takeUntil,
 } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { LoadingSpinnerComponent } from 'src/app/shared/components/loading-spinner/loading-spinner.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
 @Component({
   templateUrl: './streaming-container.component.html',
+  styleUrls: ['./streaming-container.component.scss'],
   providers: [StreamIngestionService],
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingSpinnerComponent, ButtonComponent],
   standalone: true,
 })
 export class StreamingContainer implements OnDestroy {

@@ -1,12 +1,29 @@
-<ng-container *ngIf="isStreamActive$ | async; else noStream">
-  <div id="video-container">
-    <h2>Live Video Stream</h2>
-    <img [src]="streamUrl" alt="Video Stream" />
+<app-button
+  buttonText="Start Stream"
+  (buttonClicked)="startStream()"
+></app-button>
+<app-button
+  buttonText="Stop Stream"
+  (buttonClicked)="onStopVideo()"
+></app-button>
+<div class="base-container">
+  <div class="streams-container">
+    <ng-container *ngIf="isStreamActive$ | async; else noStream">
+      <div class="d-flex justify-content-around">
+        <div class="stream-container">
+          <div class="stream">
+            <img [src]="streamUrl" alt="Video Stream" />
+          </div>
+        </div>
+        <div class="stream-container">test</div>
+      </div>
+    </ng-container>
   </div>
-  <button (click)="onStopVideo()">Stop Stream</button>
-</ng-container>
+</div>
 
 <ng-template #noStream>
-  <button (click)="startStream()">Start Stream</button>
-  <p>No active stream available.</p>
+  <div class="loader-container">
+    <app-loader></app-loader>
+    <p>No active stream available.</p>
+  </div>
 </ng-template>
