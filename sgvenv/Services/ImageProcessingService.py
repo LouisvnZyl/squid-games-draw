@@ -6,6 +6,9 @@ import time
 from Services.ImageService import initialize_video_stream, build_stream_frames, create_painting_canvas, display_frame
 from Services.GeastureService import initialize_mediapipe, predict_hand_landmark, draw_hand_landmarks
 
+shouldStreamBeOpen = True
+isStreamActive = False
+
 def image_stream_loop():
     # Giving different arrays to handle colour points of different colour
     bpoints = [deque(maxlen=1024)]
@@ -39,8 +42,12 @@ def image_stream_loop():
 
     # Define the absolute path where the image will be saved (on the Raspberry Pi Desktop)
     output_filename = "DrawnImages/drawing_output.png"
-    
-    while True:
+
+    global shouldStreamBeOpen
+    global isStreamActive
+    shouldStreamBeOpen = True
+
+    while shouldStreamBeOpen:
         # Capture frame from webcam
         ret, frame, framergb = build_stream_frames(cap)
         
@@ -116,24 +123,23 @@ def image_stream_loop():
                         continue
                     cv2.line(frame, points[i][j][k - 1], points[i][j][k], colors[i], 2)
                     cv2.line(paintWindow, points[i][j][k - 1], points[i][j][k], colors[i], 2)
-
-        # Save the drawing if the time exceeds 60 seconds
-        if time.time() - start_time >= 60:
-            paintWindow = cv2.convertScaleAbs(paintWindow)  # Convert drawing to 8-bit
-            cv2.imwrite(output_filename, paintWindow)  # Save drawing, not the frame
-            print(f"Image saved as {output_filename}")
-            break
         
         # Convert frame to bytes for streaming
         frame_bytes = get_frame_bytes(frame)
 
-        display_frame("Test", frame)
+        isStreamActive = True
+
         # Yield the frame for the MJPEG stream
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        
+    paintWindow = cv2.convertScaleAbs(paintWindow)  # Convert drawing to 8-bit
+    cv2.imwrite(output_filename, paintWindow)  # Save drawing, not the frame
     
     cap.release()
     cv2.destroyAllWindows()
+
+    isStreamActive = False
 
 def get_frame_bytes(frame) -> bytes:
     # Encode frame as JPEG image
@@ -143,3 +149,12 @@ def get_frame_bytes(frame) -> bytes:
         return b""
     
     return jpeg.tobytes()
+
+def is_stream_active() -> bool:
+    global isStreamActive
+    return isStreamActive
+    
+
+def stop_stream():
+    global shouldStreamBeOpen
+    shouldStreamBeOpen = False

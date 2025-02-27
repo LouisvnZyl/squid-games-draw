@@ -4,13 +4,21 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class StreamIngestionService {
-  private url: string = 'http://localhost:5000/video/video_feed';
+  private url: string = 'http://localhost:5000/video';
 
   constructor(private readonly _httpClient: HttpClient) {}
 
   public getVideoStream(): Observable<ArrayBuffer> {
-    return this._httpClient.get('http://localhost:5000/video/video_feed', {
+    return this._httpClient.get(`${this.url}/video-feed`, {
       responseType: 'arraybuffer',
     });
+  }
+
+  public stopVideoStream(): Observable<void> {
+    return this._httpClient.get<void>(`${this.url}/stop-video`);
+  }
+
+  public checkStreamHealth(): Observable<boolean> {
+    return this._httpClient.get<boolean>(`${this.url}/stream-health`);
   }
 }
