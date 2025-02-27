@@ -6,10 +6,19 @@ import { AppComponent } from './app.component';
 import { StreamingModule } from './modules/streaming/streaming.module';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NavBarComponent } from './shared/components/nav-bar/nav-bar.component';
+import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, AppRoutingModule, StreamingModule, HttpClientModule, BrowserAnimationsModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    StreamingModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    NavBarComponent,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })
