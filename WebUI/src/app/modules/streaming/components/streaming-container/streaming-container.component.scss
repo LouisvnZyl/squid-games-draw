@@ -1,5 +1,22 @@
 .streams-container {
   margin: 1.5rem;
+
+  .stream-container {
+    width: 45%;
+    height: 45%;
+    border: solid;
+    border-color: red;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
 }
 
 .loader-container {

@@ -11,11 +11,11 @@
     <ng-container *ngIf="isStreamActive$ | async; else noStream">
       <div class="d-flex justify-content-around">
         <div class="stream-container">
-          <div class="stream">
-            <img [src]="streamUrl" alt="Video Stream" />
-          </div>
+          <img [src]="streamUrl" alt="Video Stream" />
         </div>
-        <div class="stream-container">test</div>
+        <div class="stream-container">
+          <img [src]="streamUrl" alt="Draw Stream" />
+        </div>
       </div>
     </ng-container>
   </div>
