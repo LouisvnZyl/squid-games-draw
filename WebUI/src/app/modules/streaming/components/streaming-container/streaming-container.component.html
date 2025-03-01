@@ -18,9 +18,20 @@
   </div>
 </div>
 
+<div *ngIf="drawnImageUrl; else noImage">
+  <img [src]="drawnImageUrl" alt="Drawn Image" />
+</div>
+
 <ng-template #noStream>
   <div class="loader-container">
     <app-loader></app-loader>
     <p>No active stream available.</p>
+  </div>
+</ng-template>
+
+<ng-template #noImage>
+  <div class="loader-container">
+    <app-loader></app-loader>
+    <p>No drawn image available.</p>
   </div>
 </ng-template>
