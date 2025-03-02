@@ -1,0 +1,49 @@
+.start-stream-button {
+  background-color: #e60058; /* Bright red color similar to Squid Game's theme */
+  border: 2px solid #ffffff; /* White border for a clean look */
+  color: #ffffff; /* White text color */
+  font-family: "Roboto", sans-serif; /* Sleek font */
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 30px; /* Rounded corners for a modern look */
+  text-transform: uppercase; /* All caps text for a bold effect */
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease; /* Smooth transition */
+
+  .start-stream-button:hover {
+    background-color: #ff3333; /* Slightly lighter red on hover */
+    transform: scale(1.05); /* Slight scale-up effect on hover */
+  }
+}
+
+.start-stream-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+}
+
+.start-stream-button:hover {
+  background-color: #ff3333; /* Slightly lighter red on hover */
+  transform: scale(1.05); /* Slight scale-up effect on hover */
+}
+
+.start-stream-button:active {
+  background-color: #b30000; /* Darker red when clicked */
+}
+
+.start-stream-button:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}

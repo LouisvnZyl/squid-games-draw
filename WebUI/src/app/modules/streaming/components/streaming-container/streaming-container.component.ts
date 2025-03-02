@@ -11,27 +11,38 @@ import {
   takeUntil,
 } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { LoadingSpinnerComponent } from 'src/app/shared/components/loading-spinner/loading-spinner.component';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ImageProcessingService } from '../../services/image-processing.service';
 
 @Component({
   templateUrl: './streaming-container.component.html',
-  providers: [StreamIngestionService],
-  imports: [CommonModule],
+  styleUrls: ['./streaming-container.component.scss'],
+  providers: [StreamIngestionService, ImageProcessingService],
+  imports: [CommonModule, LoadingSpinnerComponent, ButtonComponent],
   standalone: true,
 })
 export class StreamingContainer implements OnDestroy {
   streamUrl: string = 'http://localhost:5000/video/video-feed';
   videoElement: HTMLImageElement | null = null;
 
+  public drawnImageUrl: string | undefined = '';
+
   public readonly isStreamActive$ = new BehaviorSubject<boolean>(false);
 
   private readonly _stopStream$ = new Subject<void>();
   private readonly _startStream$ = new Subject<void>();
   private readonly _destroy$ = new Subject<void>();
+  private readonly _getDrawnImage$ = new Subject<void>();
 
-  constructor(private readonly streamIngestionService: StreamIngestionService) {
+  constructor(
+    private readonly streamIngestionService: StreamIngestionService,
+    private readonly imageProcessingService: ImageProcessingService
+  ) {
     this.setUpStreamStoppingObservable();
     this.setUpStreamEvaluation();
     this.setUpStartStream();
+    this.setUpGetDrawnImage();
   }
 
   public ngOnDestroy(): void {
@@ -90,6 +101,20 @@ export class StreamingContainer implements OnDestroy {
           return this.streamIngestionService.stopVideoStream();
         })
       )
-      .subscribe();
+      .subscribe(() => {
+        this._getDrawnImage$.next();
+      });
+  }
+
+  private setUpGetDrawnImage(): void {
+    this._getDrawnImage$
+      .pipe(
+        switchMap(() => {
+          return this.imageProcessingService.getDrawnImage();
+        })
+      )
+      .subscribe((image) => {
+        this.drawnImageUrl = URL.createObjectURL(image);
+      });
   }
 }
