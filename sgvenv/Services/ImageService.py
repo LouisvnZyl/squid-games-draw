@@ -19,3 +19,8 @@ def load_image(img_path):
     image = cv2.imread(img_path)
     
     return image
+
+def load_image_greyscale(img_path):
+    image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    
+    return image

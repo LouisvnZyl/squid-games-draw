@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import tensorflow as tf
 from keras._tf_keras.keras.models import load_model, Model
-from Services.ImageService import load_image
+from Services.ImageService import load_image, load_image_greyscale
 
 def load_cnn_model() -> Model:
     model = load_model('Models/cnn_model.h5')
@@ -11,21 +11,15 @@ def load_cnn_model() -> Model:
 
 def process_image(image_path, img_size=256):
     
-    image = load_image(image_path)
+    image = load_image_greyscale(image_path)
     
-    cv2.imshow('Test',image)
+    image = cv2.resize(image, (img_size, img_size))
     
-    print(image)
+    image = image.astype('float32') / 255
     
-    image = cv2.cvtColor(image, cv2.IMREAD_GRAYSCALE)
+    image = np.expand_dims(image, axis=-1)
     
-    img = cv2.resize(image, (img_size, img_size))
-    
-    img = img.astype('float32') / 255
-    
-    img = np.expand_dims(img, axis=-1)
-    
-    img = np.expand_dims(img, axis=0)
+    image = np.expand_dims(image, axis=0)
     
     return image
 
