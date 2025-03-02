@@ -1,33 +1,9 @@
 import cv2
-import numpy as np
 import io
 from PIL import Image
 
-def initialize_video_stream(sourceIndex: int) -> cv2.VideoCapture:
-    cap = cv2.VideoCapture(sourceIndex)
-    
-    return cap
-    
-def create_painting_canvas() -> np.ndarray:
-    paintWindow = np.zeros((471, 636, 3)) + 255
-    
-    return paintWindow
-    
-def build_stream_frames(cap: cv2.VideoCapture):    
-    # Read each frame from the capture source
-    ret, frame = cap.read()
-    
-    # Flip the frame vertically
-    frame = cv2.flip(frame, 1)
-    framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    
-    return ret, frame, framergb
-
-def display_frame(frameName: str ,frame):
-    cv2.imshow(frameName, frame)
-
-def get_latest_drawn_image():
-    image = cv2.imread("DrawnImages/drawing_output.png")
+def get_latest_drawn_image_bytes():
+    image = load_image("DrawnImages/drawing_output.png")
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -38,3 +14,13 @@ def get_latest_drawn_image():
     img_byte_array.seek(0)
 
     return img_byte_array
+
+def load_image(img_path):
+    image = cv2.imread(img_path)
+    
+    return image
+
+def load_image_greyscale(img_path):
+    image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    
+    return image

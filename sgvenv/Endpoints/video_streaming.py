@@ -1,5 +1,5 @@
 from flask import Blueprint, Response
-from Services.ImageProcessingService import image_stream_loop, stop_stream, is_stream_active
+from Services.StreamingService import image_stream_loop, stop_stream, is_stream_active
 
 video_routes = Blueprint('video_routes', __name__)
 

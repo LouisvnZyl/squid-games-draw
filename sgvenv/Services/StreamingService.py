@@ -3,7 +3,7 @@ import numpy as np
 import mediapipe as mp
 from collections import deque
 import time
-from Services.ImageService import initialize_video_stream, build_stream_frames, create_painting_canvas, display_frame
+from Services.StreamInitialisationService import initialize_video_stream, build_stream_frames, create_painting_canvas, display_frame
 from Services.GeastureService import initialize_mediapipe, predict_hand_landmark, draw_hand_landmarks
 
 shouldStreamBeOpen = True
