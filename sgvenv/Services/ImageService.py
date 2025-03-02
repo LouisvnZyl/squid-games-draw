@@ -3,7 +3,7 @@ import io
 from PIL import Image
 
 def get_latest_drawn_image_bytes():
-    image = load_image()
+    image = load_image("DrawnImages/drawing_output.png")
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -16,6 +16,6 @@ def get_latest_drawn_image_bytes():
     return img_byte_array
 
 def load_image(img_path):
-    image = cv2.imread("DrawnImages/drawing_output.png")
+    image = cv2.imread(img_path)
     
     return image

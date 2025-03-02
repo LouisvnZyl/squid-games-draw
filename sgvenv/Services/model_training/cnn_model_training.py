@@ -132,4 +132,4 @@ model.fit(x_train, y_train, epochs=5, batch_size=256, validation_data=(x_test, y
 test_loss, test_acc = model.evaluate(x_test, y_test)
 print(f"Test accuracy: {test_acc:.4f}")
 
-print(f"Training data shape: {x_train.shape}, Test data shape: {x_test.shape}")
+model.save('Models/cnn_model.h5')
