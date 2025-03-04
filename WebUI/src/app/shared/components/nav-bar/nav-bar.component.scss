@@ -14,6 +14,12 @@
 .logo-container {
   display: flex;
   align-items: center;
+
+  .games-heading {
+    margin-bottom: 0;
+    margin-left: 1rem;
+    color: #c53058;
+  }
 }
 
 .logo {
